@@ -1,5 +1,4 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { type } from "os";
 
 interface idType {
   id: string;
@@ -49,7 +48,7 @@ const getTodo = function(req: FastifyRequest<{ Params: idType}>, reply: FastifyR
 const postTodo = function(req: FastifyRequest<{ Body: todoType}>, reply: FastifyReply) {
   const { title, description, completed } = req.body
   const todo = {
-    id: todos.length + 1,
+    id: todos.length + 1, // todo: fix this logic results in duplicate ids
     title,
     description,
     completed
