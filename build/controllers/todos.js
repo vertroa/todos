@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const todos_1 = require("../models/todos");
 // Sample data for todo testing
 var todos = [
     {
@@ -17,11 +18,11 @@ var todos = [
 ];
 // GET /todos
 const getTodos = function (req, reply) {
-    return todos;
+    return (0, todos_1.getAllTodos)();
 };
 // GET /todo/:id
 const getTodo = function (req, reply) {
-    const todo = todos.find(todo => todo.id === parseInt(req.params.id));
+    const todo = (0, todos_1.getTodoById)(parseInt(req.params.id));
     if (todo) {
         return todo;
     }
@@ -31,18 +32,17 @@ const getTodo = function (req, reply) {
 const postTodo = function (req, reply) {
     const { title, description, completed } = req.body;
     const todo = {
-        id: todos.length + 1,
         title,
         description,
         completed
     };
-    todos.push(todo);
-    return todo;
+    const newTodo = (0, todos_1.createTodo)(todo);
+    return newTodo;
 };
 // PUT /todo/:id
 const putTodo = function (req, reply) {
     const { title, description, completed } = req.body;
-    const todo = todos.find(todo => todo.id === parseInt(req.params.id));
+    const todo = (0, todos_1.getTodoById)(parseInt(req.params.id));
     if (typeof todo === 'undefined') {
         return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' });
     }
@@ -55,17 +55,16 @@ const putTodo = function (req, reply) {
     if (completed) {
         todo.completed = completed;
     }
-    return reply.send({ todo });
+    const updatedTodo = (0, todos_1.updateTodoById)(parseInt(req.params.id), todo);
+    return updatedTodo;
 };
 // DELETE /todo/:id
-const deleteTodo = function (req, reply) {
-    const todo = todos.find(todo => todo.id === parseInt(req.params.id));
-    if (todo === 'undefined') {
-        console.log('Todo not found');
+const deleteTodo = async function (req, reply) {
+    const todo = await (0, todos_1.getTodoById)(parseInt(req.params.id));
+    if (todo === 'undefined' || todo === null) {
         return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' });
     }
-    // delete todos[parseInt(req.params.id) - 1]
-    todos.splice(todos.indexOf(todo), 1);
-    return reply.send({ 'msg': 'todo successfully removed', 'todos': todos });
+    (0, todos_1.deleteTodoById)(todo.id);
+    return reply.send({ 'msg': 'todo successfully removed' });
 };
 module.exports = { getTodos, getTodo, postTodo, putTodo, deleteTodo };

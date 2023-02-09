@@ -1,11 +1,12 @@
 import { FastifyReply, FastifyRequest } from "fastify";
+import { createTodo, deleteTodoById, getAllTodos, getTodoById, updateTodoById } from "../models/todos";
 
-interface idType {
+interface IdType {
   id: string;
 }
 
-interface todoType {
-  id: number;
+export interface TodoType {
+  // id: number;
   title: string;
   description: string;
   completed: boolean;
@@ -29,12 +30,12 @@ var todos = [
 
 // GET /todos
 const getTodos = function(req: FastifyRequest, reply: FastifyReply) {
-  return todos
+  return getAllTodos()
 }
 
 // GET /todo/:id
-const getTodo = function(req: FastifyRequest<{ Params: idType}>, reply: FastifyReply) {
-  const todo = todos.find(todo => todo.id === parseInt(req.params.id))
+const getTodo = function(req: FastifyRequest<{ Params: IdType}>, reply: FastifyReply) {
+  const todo = getTodoById(parseInt(req.params.id)) 
 
   if (todo) {
     return todo
@@ -45,22 +46,21 @@ const getTodo = function(req: FastifyRequest<{ Params: idType}>, reply: FastifyR
 
 
 // POST /todos
-const postTodo = function(req: FastifyRequest<{ Body: todoType}>, reply: FastifyReply) {
+const postTodo = function(req: FastifyRequest<{ Body: TodoType}>, reply: FastifyReply) {
   const { title, description, completed } = req.body
   const todo = {
-    id: todos.length + 1, // todo: fix this logic results in duplicate ids
     title,
     description,
     completed
   }
-  todos.push(todo)
-  return todo 
+  const newTodo = createTodo(todo)
+  return newTodo 
 }
 
 // PUT /todo/:id
-const putTodo = function(req: FastifyRequest<{ Params: idType, Body: todoType}>, reply: FastifyReply) {
+const putTodo = function(req: FastifyRequest<{ Params: IdType, Body: TodoType}>, reply: FastifyReply) {
   const { title, description, completed } = req.body
-  const todo: any = todos.find(todo => todo.id === parseInt(req.params.id))
+  const todo: any = getTodoById(parseInt(req.params.id)) 
 
   if (typeof todo === 'undefined') {
     return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' })
@@ -75,22 +75,21 @@ const putTodo = function(req: FastifyRequest<{ Params: idType, Body: todoType}>,
   if (completed) {
     todo.completed = completed
   }
-  return reply.send({ todo })
+  const updatedTodo = updateTodoById(parseInt(req.params.id), todo) 
+  return updatedTodo
 }
 
 
 // DELETE /todo/:id
-const deleteTodo = function(req: FastifyRequest<{ Params: idType}>, reply: FastifyReply) {
-  const todo: any = todos.find(todo => todo.id === parseInt(req.params.id))
-  if (todo === 'undefined') {
-    console.log('Todo not found')
+const deleteTodo = async function(req: FastifyRequest<{ Params: IdType}>, reply: FastifyReply) {
+  const todo: any = await getTodoById(parseInt(req.params.id)) 
+  
+  if (todo === 'undefined' || todo === null) {
     return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' })
   }
 
-  // delete todos[parseInt(req.params.id) - 1]
-
-  todos.splice(todos.indexOf(todo), 1)
-  return reply.send({ 'msg': 'todo successfully removed', 'todos': todos})
+  deleteTodoById(todo.id)
+  return reply.send({ 'msg': 'todo successfully removed'})
 }
 
 
