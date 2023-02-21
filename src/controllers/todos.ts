@@ -12,30 +12,14 @@ export interface TodoType {
   completed: boolean;
 }
 
-// Sample data for todo testing
-var todos = [
-  {
-    id: 1,
-    title: 'Todo 1',
-    description: 'Todo 1 description',
-    completed: false
-  },
-  {
-    id: 2,
-    title: 'Todo 2',
-    description: 'Todo 2 description',
-    completed: false
-  }
-]
-
 // GET /todos
 const getTodos = function(req: FastifyRequest, reply: FastifyReply) {
   return getAllTodos()
 }
 
 // GET /todo/:id
-const getTodo = function(req: FastifyRequest<{ Params: IdType}>, reply: FastifyReply) {
-  const todo = getTodoById(parseInt(req.params.id)) 
+const getTodo = async function(req: FastifyRequest<{ Params: IdType}>, reply: FastifyReply) {
+  const todo = await getTodoById(parseInt(req.params.id)) 
 
   if (todo) {
     return todo
@@ -58,9 +42,9 @@ const postTodo = function(req: FastifyRequest<{ Body: TodoType}>, reply: Fastify
 }
 
 // PUT /todo/:id
-const putTodo = function(req: FastifyRequest<{ Params: IdType, Body: TodoType}>, reply: FastifyReply) {
+const putTodo = async function(req: FastifyRequest<{ Params: IdType, Body: TodoType}>, reply: FastifyReply) {
   const { title, description, completed } = req.body
-  const todo: any = getTodoById(parseInt(req.params.id)) 
+  const todo: any = await getTodoById(parseInt(req.params.id)) 
 
   if (typeof todo === 'undefined') {
     return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' })
@@ -83,7 +67,7 @@ const putTodo = function(req: FastifyRequest<{ Params: IdType, Body: TodoType}>,
 // DELETE /todo/:id
 const deleteTodo = async function(req: FastifyRequest<{ Params: IdType}>, reply: FastifyReply) {
   const todo: any = await getTodoById(parseInt(req.params.id)) 
-  
+
   if (todo === 'undefined' || todo === null) {
     return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' })
   }

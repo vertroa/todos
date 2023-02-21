@@ -1,28 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const todos_1 = require("../models/todos");
-// Sample data for todo testing
-var todos = [
-    {
-        id: 1,
-        title: 'Todo 1',
-        description: 'Todo 1 description',
-        completed: false
-    },
-    {
-        id: 2,
-        title: 'Todo 2',
-        description: 'Todo 2 description',
-        completed: false
-    }
-];
 // GET /todos
 const getTodos = function (req, reply) {
     return (0, todos_1.getAllTodos)();
 };
 // GET /todo/:id
-const getTodo = function (req, reply) {
-    const todo = (0, todos_1.getTodoById)(parseInt(req.params.id));
+const getTodo = async function (req, reply) {
+    const todo = await (0, todos_1.getTodoById)(parseInt(req.params.id));
     if (todo) {
         return todo;
     }
@@ -40,9 +25,9 @@ const postTodo = function (req, reply) {
     return newTodo;
 };
 // PUT /todo/:id
-const putTodo = function (req, reply) {
+const putTodo = async function (req, reply) {
     const { title, description, completed } = req.body;
-    const todo = (0, todos_1.getTodoById)(parseInt(req.params.id));
+    const todo = await (0, todos_1.getTodoById)(parseInt(req.params.id));
     if (typeof todo === 'undefined') {
         return reply.code(404).send({ error: 'Todo not found', message: 'No todo found with the given id' });
     }
