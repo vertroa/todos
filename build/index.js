@@ -4,7 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fastify_1 = __importDefault(require("fastify"));
+const cors_1 = __importDefault(require("@fastify/cors"));
 const server = (0, fastify_1.default)();
+// Register CORS
+server.register(cors_1.default, {
+    origin: true,
+    // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+});
 // Register routes to handle todos
 const todoRoutes = require('./routes/todos');
 todoRoutes.forEach((route) => {

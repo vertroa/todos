@@ -1,7 +1,13 @@
 import fastify, { RouteOptions } from 'fastify'
+import cors from '@fastify/cors'
 
 const server = fastify()
 
+// Register CORS
+server.register(cors, { 
+  origin: true,
+  // methods: ['GET', 'POST', 'PUT', 'DELETE'],
+})
 
 // Register routes to handle todos
 const todoRoutes = require('./routes/todos')
